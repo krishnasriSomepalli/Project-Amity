@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<style>
+        button:focus{
+        	outline:0;
+        }
+        .button{
+            background-color: transparent;
+            border: 1px solid #222;
+            border-radius: 14px;
+            color: #222;
+            width: 80px;
+            padding-top: 4px;
+            padding-bottom: 4px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            font-weight: 500;
+            transition-delay: 0s;
+            transition: background 1s, color 1s;
+        }
+        #close:hover{
+        	color: red;
+        	background: transparent;
+            transition: color 1s;
+        }
+        #menu{
+        	color:#000; 
+        	background:transparent; 
+        	border:none; 
+        	font-size:28px; 
+        	margin-left:6px;
+            transition: color 0.5s;
+        }
+        #menu:hover{
+        	color:#777;
+        }
+        .sidebarItem{
+        	width:100%; 
+        	height:100%; 
+        	display:flex; 
+        	justify-content:flex-start; 
+        	align-items:center; 
+        	font-size:12px; 
+        	padding-left:16%; 
+        	color:#444;
+        }
+        .sidebarItem:hover{
+        	cursor: pointer;
+        	font-weight: 600;
+        } 
+	</style>
+	<body onresize="w3_close()">
+        <!--Collapsible sidebar-->
+        <div class="w3-sidebar w3-bar-block w3-collapse w3-card w3-animate-left" style="width:17%; position:relative;" id="SideBar">
+            <button id="close" class="w3-hide-large" style="background:transparent; border:none; font-size:21px; margin-left:6px; margin-top:4px;" onclick="w3_close()">&times;</button>
+            <!--User profile-->
+            <div style="width:100%; height:200px; display:flex; flex-direction:column; justify-content:center; align-items:center; margin-bottom:6px; border-bottom:1px solid #E6EBF1;">
+            	<div style="height:6px;"></div>
+                <img src="static/images/femaleUser.png" style="border-radius:50%; width:90px;"/>
+                <div style="height:6px;"></div>
+                <p style="font-size:12px; color:#74838B;">Jane Doe</p>
+                <p style="font-size:12px; color:#74838B;">SOFTWARE ENGINEERING INTERN</p>
+                <p style="font-size:12px; color:#74838B;">SC COGS Eng India</p>
+                <div style="height:6px;"></div>
+            </div>
+            <!--Navigation Items-->
+            {% for item in items %}
+	            {% if title==item %}
+		            <div id="sidebarItemModel" style="width:100%; height:56px; display:flex; background:#f6e0df">
+		                <div class="sidebarItem">{{item}}</div>
+		            </div>	
+		        {% else %}
+		            <div id="sidebarItemModel" style="width:100%; height:56px; display:flex;">
+		                <div class="sidebarItem">{{item}}</div>
+		            </div>
+		        {% endif %}
+	        {% endfor %}
+            <div style="width:100%; height:56px; display:flex; border:1px solid #E6EBF1; position:absolute; bottom:0;">
+                <div class="sidebarItem" style="width:100%; height:100%; display:flex; justify-content:flex-start; align-items:center; font-size:12px; padding-left:16%; color:#444;">Sign Out</div>
+            </div>
+        </div>
+        <!--Heading-->
+        <div class="w3-main" style="margin-left:17%; height:100vh;">
+            <div style="height:10vh; display:flex; align-items:center;background:#f6e0df;">
+                <button class="w3-hide-large" id="menu" onclick="w3_open()">&#9776;</button>
+                <!--Logo & Branding-->
+                <div style="width:100vw; display:flex; align-items:center; justify-content:center; padding-right:10%;">
+                	<p style="color:#222; font-family:'Advent Pro'; margin-left:16px; margin-top:8px; font-weight:lighter; font-size:34px;">Amity</p>
+            	</div>
+            </div>
+            <!-- Actual content -->
+            {% block main %}{% endblock %}
+        </div>
+        <script>
+            function w3_open() {
+                document.getElementById("SideBar").style.display = "block";
+                document.getElementById("SideBar").style.width = "70%";
+            }
+            
+            function w3_close() {
+                document.getElementById("SideBar").style.display = "none";
+                document.getElementById("SideBar").style.width = "17%";
+            }
+        </script>
+    </body>
+{% endblock %}
