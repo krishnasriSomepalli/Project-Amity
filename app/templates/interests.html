@@ -1,0 +1,16 @@
+{% extends "sidebar.html" %}
+
+{% block main %}
+	<div style="height:90vh; padding-left:16px;">
+		<p>Edit Your Intersts:</p>
+		<form method="POST" action="/interests">
+			{% for interest in interests %}
+				{% if interest in selected %}
+	            	<input type="checkbox" checked>{{interest}} <br>
+		        {% else %}
+	            	<input type="checkbox">{{interest}} <br>
+		        {% endif %}
+	        {% endfor %}
+		</form>
+	</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "sidebar.html" %}
+
+{% block main %}
+	<div style="height:90vh; padding-left:16px;">
+		<form method="POST" action="/new_event_created">
+			<input type="text" placeholder="Event Name" id="event_name" ><br>
+			<label for="event_type1">Event Type:</label><br>
+			<select id="event_type1">
+				<option>Breakfast/Lunch/Dinner/Snacks</option>
+				<option>Sports/Games</option>
+				<option>Mentoring</option>
+				<option>Discussion</option>
+				<option>Speak</option>
+			</select><br>
+			<label>Over Breakfast/Lunch/Dinner/Snacks:</label>
+			<input type="radio" name="food" checked> Yes
+			<input type="radio" name="food"> No <br>
+			<label for="event_date">Date:</label><br>
+			<input type="date" id="event_date"><br>
+			<label for="event_time">Time:</label><br>
+			<input type="time" id="event_time"><br>
+			<input type="text" placeholder="Event Location" id="event_loc" ><br>
+			<label for="closest_building">Location in/near:</label><br>
+			<select id="closest_building">
+				<option>B1</option>
+				<option>B2</option>
+				<option>B3</option>
+				<option>SSKC</option>
+			</select><br>
+			<label for="people">Number of people (inclusive range):</label><br>
+			<input type="number" placeholder="Minimum" id="people" ><br>
+			<input type="number" placeholder="Maximum" id="people" ><br>
+			<label for="event_description">Comment:</label><br>
+  			<textarea rows="5" id="event_description"></textarea><br>
+  			<button type="submit" value="Submit">Submit</button>
+			<button type="reset" value="Reset">Reset</button>
+		</form>
+	</div>
+{% endblock %}
