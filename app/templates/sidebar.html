@@ -70,15 +70,16 @@
             <!--Navigation Items-->
             {% for item in items %}
 	            {% if title==item %}
-		            <div id="sidebarItemModel" style="width:100%; height:56px; display:flex; background:#f6e0df">
+		            <div style="width:100%; height:56px; display:flex; background:#f6e0df">
 		                <div class="sidebarItem">{{item}}</div>
 		            </div>	
 		        {% else %}
-		            <div id="sidebarItemModel" style="width:100%; height:56px; display:flex;">
+		            <div style="width:100%; height:56px; display:flex;" onclick="navigate(event)">
 		                <div class="sidebarItem">{{item}}</div>
 		            </div>
 		        {% endif %}
 	        {% endfor %}
+            <form id="navigateForm" style="display:none;" method="GET"></form>
             <div style="width:100%; height:56px; display:flex; border:1px solid #E6EBF1; position:absolute; bottom:0;">
                 <div class="sidebarItem" style="width:100%; height:100%; display:flex; justify-content:flex-start; align-items:center; font-size:12px; padding-left:16%; color:#444;">Sign Out</div>
             </div>
@@ -104,6 +105,40 @@
             function w3_close() {
                 document.getElementById("SideBar").style.display = "none";
                 document.getElementById("SideBar").style.width = "17%";
+            }
+
+            function navigate(event) {
+                var menu = [{
+                    key: "Current Events",
+                    value: "/running"
+                }, {
+                    key: "Explore",
+                    value: "/explore"
+                }, {
+                    key: "History",
+                    value: "/history"
+                }, {
+                    key: "Create New Event",
+                    value: "/new"
+                }, {
+                    key: "Edit Interests",
+                    value: "/interests"
+                }]
+
+                var form = document.getElementById('navigateForm');
+                var selected = event.target.innerHTML;
+                var value = search(selected, menu).value;
+                
+                form.setAttribute("action", value);
+                form.submit();
+            }
+
+            function search(key, array){
+                for (var i=0; i < array.length; i++) {
+                    if (array[i].key === key) {
+                        return array[i];
+                    }
+                }
             }
         </script>
     </body>
