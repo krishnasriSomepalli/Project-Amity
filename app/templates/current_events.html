@@ -10,86 +10,94 @@
 		    background-color: #999;
 		}
 	</style>
+    {% macro card(item, index) -%}
+        <div style="width:200px; height:200px; margin-left:8px; margin-right:16px; box-shadow:1px 1px 20px #ddd; display:inline-block;">
+            <div style="width:200px; height:50px; border:1px solid grey;">
+                <p>{{item.event_name}}</p>
+            </div>
+            <div style="width:200px; height:100px; border:1px solid grey; overflow-x:auto; overflow-y:hidden;">
+                <p>{{item.event_start}} to {{item.event_end}}</p>
+                <p>{{item.event_location}}</p>
+                <p>{{item.attending}} out of {{item.min_people}}-{{item.max_people}} people attending</p>
+            </div>
+            <div style="width:200px; height:50px; border:1px solid grey;">
+                <a class="button" href="#" data-toggle="modal" data-target="#dropout{{index}}">Drop Out</a>
+                <a class="button" href="#" data-toggle="modal" data-target="#expand{{index}}">Expand</a>
+            </div>
+        </div>
+    {%- endmacro %}
+    {% macro modals(item, index) -%}
+        <div class="modal fade" id="expand{{index}}" role="dialog">
+            <div class="modal-dialog">
+            <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">{{item.event_name}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>{{item.event_type}}</p>
+                        <p>Food: {{item.food}}</p>
+                        <p>{{item.event_start}} to {{item.event_end}}</p>
+                        <p>{{item.event_location}}</p>
+                        <p>People</p>
+                        <div style="overflow-x:auto; white-space:nowrap;" class="scrollbar">
+                            {% for person in item.people %}
+                                <div style="width:70px; display:inline-block;">
+                                    <p>{{person}}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <p>{{item.event_desc}}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="button" href="#" data-toggle="modal" data-target="#dropout{{index}}">Drop Out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="dropout{{index}}" role="dialog">
+            <div class="modal-dialog">
+            <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <!-- Check time -->
+                        <p>Please confirm that you want to drop out of the event {{item.event_name}}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="button" href="#">Confirm</a>
+                        <a class="button" href="#" data-dismiss="modal">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {%- endmacro %}
 	<div style="height:90vh; padding-left:16px;">
 		<div style="width:100%; height:270px; display:flex; flex-direction:column; justify-content:space-around;">
 			<p style="color:#74838B; font-size:16px; margin-left:8px; margin-top:8px;">Pending</p>
 			<div style="height:250px; overflow-x:auto; overflow-y:hidden; white-space:nowrap;" class="scrollbar">
-				<div style="width:200px; height:200px; margin-left:8px; margin-right:16px; box-shadow:1px 1px 20px #ddd; display:inline-block;">
-					<div style="width:200px; height:50px; border:1px solid grey;">
-						<p>CSS over Lunch</p>
-					</div>
-					<div style="width:200px; height:100px; border:1px solid grey;">
-						<p>23/07/2018 | 12:30-13:15</p>
-						<p>B1 cafeteria</p>
-						<p>2/5 people attending</p>
-					</div>
-					<div style="width:200px; height:50px; border:1px solid grey;">
-						<a class="button" href="#" data-toggle="modal" data-target="#dropout">Drop Out</a>
-						<a class="button" href="#" data-toggle="modal" data-target="#expand">Expand</a>
-					</div>
-				</div>
+                {% for item in pending %}
+                    {% if item %}
+                        {{card(item, loop.index)}}
+                        {{modals(item, loop.index)}}
+                    {% else %}
+                        <p>No pending events!</p>
+                    {% endif %}
+                {% endfor %}
 			</div>
 		</div>
 		<div style="width:100%; height:270px; display:flex; flex-direction:column; justify-content:space-around;">
 			<p style="color:#74838B; font-size:16px; margin-left:8px; margin-top:8px;">To-Do</p>
 			<div style="height:250px; overflow-x:auto; overflow-y:hidden; white-space:nowrap;" class="scrollbar">
-				<div style="width:200px; height:200px; margin-left:8px; margin-right:16px; box-shadow:1px 1px 20px #ddd; display:inline-block;">
-					<div style="width:200px; height:50px; border:1px solid grey;">
-						<p>CSS over Lunch</p>
-					</div>
-					<div style="width:200px; height:100px; border:1px solid grey;">
-						<p>23/07/2018 | 12:30-13:15</p>
-						<p>B1 cafeteria</p>
-						<p>2/5 people attending</p>
-					</div>
-					<div style="width:200px; height:50px; border:1px solid grey;">
-						<a class="button" href="#" data-toggle="modal" data-target="#dropout">Drop Out</a>
-						<a class="button" href="#" data-toggle="modal" data-target="#expand">Expand</a>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="modal fade" id="expand" role="dialog">
-		<div class="modal-dialog">
-		<!-- Modal content-->
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">CSS over Lunch</h4>
-				</div>
-				<div class="modal-body">
-					<p>Lunch</p>
-					<p>23/07/2018 | 12:30-13:15</p>
-					<p>B1 cafeteria</p>
-					<p>People</p>
-					<div style="overflow-x:auto; white-space:nowrap;" class="scrollbar">
-						<div style="width:70px; display:inline-block;">
-							<p>Jane Doe</p>
-						</div>
-					</div>
-					<p>Let's share our knowledge on CSS with each other, over lunch this Monday.</p>
-				</div>
-				<div class="modal-footer">
-					<a class="button" href="#" data-toggle="modal" data-target="#dropout">Drop Out</a>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="modal fade" id="dropout" role="dialog">
-		<div class="modal-dialog">
-		<!-- Modal content-->
-			<div class="modal-content">
-				<div class="modal-body">
-					<!-- Check time -->
-					<p>Please confirm that you want to drop out of the event "CSS over Lunch"</p>
-				</div>
-				<div class="modal-footer">
-					<a class="button" href="#">Confirm</a>
-					<a class="button" href="#" data-dismiss="modal">Cancel</a>
-				</div>
+				{% for item in pending %}
+                    {% if item %}
+                        {{card(item, loop.index)}}
+                        {{modals(item, loop.index)}}
+                    {% else %}
+                        <p>No events to attend!</p>
+                    {% endif %}
+                {% endfor %}
 			</div>
 		</div>
 	</div>
