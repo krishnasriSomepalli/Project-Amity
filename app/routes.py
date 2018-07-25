@@ -42,7 +42,6 @@ def get_token():
 		raise ValueError("State does not match")
 	auth_context = AuthenticationContext(AUTHORITY_URL)
 	token_response = auth_context.acquire_token_with_authorization_code(code, REDIRECT_URI, app.config['RESOURCE'], app.config['CLIENT_ID'], app.config['CLIENT_SECRET'])
-	# token_response = auth_context.acquire_token_with_client_credentials(app.config['RESOURCE'], app.config['CLIENT_ID'], app.config['CLIENT_SECRET'])
 	session['access_token'] = token_response['accessToken']
 	return flask.redirect('/graphcall')
 
