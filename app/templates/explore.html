@@ -49,6 +49,7 @@
                 </div>
             </div>
         </div>
+<!--
 
         <div class="modal fade" id="dropout{{index}}" role="dialog">
             <div class="modal-dialog">
@@ -63,17 +64,17 @@
                 </div>
             </div>
         </div>
+-->
     {%- endmacro %}
 	<div style="height:90vh; padding-left:16px;">
         <p style="color:#74838B; font-size:16px; margin-left:8px; margin-top:8px;">Events around you</p>
         <div style="height:250px; overflow-x:auto; overflow-y:hidden; white-space:nowrap;" class="scrollbar">
+            {% if events|length==0 %}
+				<p>No events happening around you. Create one yourself!</p>
+			{% endif %}
             {% for item in events %}
-                {% if item %}
-                    {{card(item, loop.index)}}
-                    {{modals(item, loop.index)}}
-                {% else %}
-                    <p>No pending events!</p>
-                {% endif %}
+            	{{card(item, loop.index)}}
+                {{modals(item, loop.index)}}
             {% endfor %}
         </div>
 	</div>

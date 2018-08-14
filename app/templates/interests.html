@@ -3,12 +3,12 @@
 {% block main %}
 	<div style="height:90vh; padding-left:16px;">
 		<p>Edit Your Intersts:</p>
-		<form method="POST" action="/interests">
+		<form method="POST" action="/edit">
 			{% for interest in interests %}
 				{% if interest in selected %}
-	            	<input type="checkbox" checked>{{interest}} <br>
+	            	<input type="checkbox" name="interest{{loop.index}}" checked>{{interest}} <br>
 		        {% else %}
-	            	<input type="checkbox">{{interest}} <br>
+	            	<input type="checkbox" name="interest{{loop.index}}">{{interest}} <br>
 		        {% endif %}
 	        {% endfor %}
             <button type="submit" value="Submit">Submit</button>
