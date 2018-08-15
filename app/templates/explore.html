@@ -17,11 +17,11 @@
             </div>
             <div style="width:200px; height:100px; border:1px solid grey; overflow-x:auto; overflow-y:hidden;">
                 <p>{{item.event_start}} to {{item.event_end}}</p>
-                <p>{{item.event_location}}</p>
+                <p>{{item.event_location}} near/in {{item.near_to}}</p>
                 <p>{{item.attending}} out of {{item.min_people}}-{{item.max_people}} people attending</p>
             </div>
             <div style="width:200px; height:50px; border:1px solid grey;">
-                <a class="button" href="#" data-toggle="modal" data-target="#dropout{{index}}">Drop Out</a>
+                <a class="button" href="#" data-toggle="modal" data-target="#join{{index}}">Join</a>
                 <a class="button" href="#" data-toggle="modal" data-target="#expand{{index}}">Expand</a>
             </div>
         </div>
@@ -40,31 +40,31 @@
                         <p>Food: {{item.food}}</p>
                         <p>{{item.event_start}} to {{item.event_end}}</p>
                         <p>{{item.attending}} out of {{item.min_people}}-{{item.max_people}} people attending</p>
-                        <p>{{item.event_location}}</p>
+                        <p>{{item.event_location}} near/in {{item.near_to}}</p>
                         <p>{{item.event_desc}}</p>
                     </div>
                     <div class="modal-footer">
-                        <a class="button" href="#" data-toggle="modal" data-target="#dropout{{index}}">Drop Out</a>
+                        <a class="button" href="#" data-toggle="modal" data-target="#join{{index}}">Join</a>
                     </div>
                 </div>
             </div>
         </div>
-<!--
-
-        <div class="modal fade" id="dropout{{index}}" role="dialog">
+        <div class="modal fade" id="join{{index}}" role="dialog">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-body">
-                        <p>Please confirm that you want to drop out of the event {{item.event_name}}</p>
+                        <p>Please confirm that you want to join the event {{item.event_name}}</p>
                     </div>
                     <div class="modal-footer">
-                        <a class="button" href="#">Confirm</a>
+                        <form action="/join" method="POST" id="join">
+                            <input type="hidden" name="event_id" value="{{item.event_id}}">
+                        </form>
+                        <a class="button" href="#" onclick="document.getElementById('join').submit()">Confirm</a>
                         <a class="button" href="#" data-dismiss="modal">Cancel</a>
                     </div>
                 </div>
             </div>
         </div>
--->
     {%- endmacro %}
 	<div style="height:90vh; padding-left:16px;">
         <p style="color:#74838B; font-size:16px; margin-left:8px; margin-top:8px;">Events around you</p>

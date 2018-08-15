@@ -5,9 +5,7 @@ from flask import render_template, session, Response, request, url_for, redirect
 from datetime import datetime
 from adal import AuthenticationContext
 from uuid import uuid4
-from app.models import Event, EventRegistrants, Interest, PersonInterests
-
-#db = SQLAlchemy()
+from app.models import Event, EventRegistrants, Interest, PersonInterests, Person
 
 PORT = 5000
 AUTHORITY_URL = app.config['AUTHORITY_HOST_URL'] + '/' + app.config['TENANT']
@@ -17,7 +15,7 @@ TEMPLATE_AUTHZ_URL = ('https://login.microsoftonline.com/{}/oauth2/authorize?' +
 items = ["Current Events", "Explore", "History", "Create New Event", "Edit Interests"]
 alias = 'richard.roe' #get this when the user logs in!!!
 
-# interests_list[] data from meetup.com
+# interests_list[] data used from meetup.com
 interests_list = list(map(lambda interest: interest.interest_name, Interest.query.all()))
 selected = list(map(lambda interest: interests_list[interest.interest_id-1], PersonInterests.query.filter_by(person_email_alias=alias).all()))
 
@@ -65,9 +63,9 @@ def graphcall():
     graph_data = request.get(endpoint, headers=http_headers, stream=False).json()
     return render_template('display_graph_info.html', graph_data=graph_data)
 
-
 @app.route('/running')
 def running():
+    update_events_status()
     # array of pending events
     pending = []
     # array of todo events
@@ -84,17 +82,27 @@ def running():
         people = []
         # all event-person mappings (EventRegistrants) with event ID e_id
         people = list(map(lambda mapping: mapping.person_email_alias, EventRegistrants.query.filter_by(event_id=e_id).all()))    
-        print(people)
         # updating details of the event, using other tables, and populating 'todo' and 'pending', depending on the status of that event 
-        if details.event_status == "pending":
-            details.people = people
-            details.attending = attending
-            pending.append(details)
-        elif details.event_status == "todo":
-            details.people = people
-            details.attending = attending
-            todo.append(details)
+        if details!=None:
+            if details.event_end > datetime.utcnow():
+                if details.event_status == "pending":
+                    details.people = people
+                    details.attending = attending
+                    pending.append(details)
+                elif details.event_status == "todo":
+                    details.people = people
+                    details.attending = attending
+                    todo.append(details)
     return render_template('current_events.html', title='Current Events', items=items, pending=pending, todo=todo)
+
+@app.route('/all')
+def all():
+    events = Event.query.all()
+    persons = Person.query.all()
+    interests = Interest.query.all()
+    registrants = EventRegistrants.query.all()
+    personinterests = PersonInterests.query.all()
+    return render_template('all.html', events=events, persons=persons, items=items, interests=interests, registrants=registrants, personinterests=personinterests)
 
 @app.route('/explore')
 def explore():
@@ -109,11 +117,38 @@ def explore():
         if (obj.event_status=="todo" and attending < obj.max_people) or obj.event_status=="pending":
             # event-person mapping for this event and the logged-in person; helps answer whether the logged-in person is attending this event or not, and thus if we need to include this in events[]
             registered = EventRegistrants.query.filter_by(person_email_alias=alias,event_id=obj.event_id).first()
-            if registered is None and obj.event_start < datetime.utcnow():
+            if registered is None and obj.event_start > datetime.utcnow():
                 obj.attending = attending
                 explore_events.append(obj)
     return render_template('explore.html', title='Explore', items=items, events=explore_events)
-                
+
+@app.route('/join', methods=['POST'])
+def join():
+    attending = EventRegistrants.query.filter_by(event_id=request.form['event_id']).count()
+    details = Event.query.filter_by(event_id=request.form['event_id']).first()
+    if (attending+1)<=details.max_people:
+        new_registrant = EventRegistrants(event_id=request.form['event_id'],person_email_alias=alias, attended=None)
+        db.session.add(new_registrant)
+        if (attending+1)>=details.min_people:
+            details.event_status="todo"
+    else:
+        print("Can't accomodate any more people. Sorry :(")
+    db.session.commit()
+    return redirect(url_for('running'))
+
+@app.route('/drop', methods=['POST'])
+def drop():
+    event = Event.query.filter_by(event_id=request.form['event_id']).first()
+    if event.created_by==alias:
+        EventRegistrants.query.filter_by(event_id=request.form['event_id']).delete()
+        db.session.delete(event)
+    else:
+        EventRegistrants.query.filter_by(event_id=request.form['event_id'],person_email_alias=alias).delete()
+        attending = EventRegistrants.query.filter_by(event_id=request.form['event_id']).count()
+        if (attending-1)<=event.min_people:
+            event.event_status=="pending"
+    db.session.commit()
+    return redirect(url_for('running'))                
 
 @app.route('/history')
 def history():
@@ -126,13 +161,12 @@ def history():
     for mapping in associated_event_mappings:
         e_id = mapping.event_id
         details = Event.query.filter_by(event_id=e_id).first()
-        if details.event_end < datetime.utcnow():
-            people = list(map(lambda mapping: mapping.person_email_alias, EventRegistrants.query.filter_by(event_id=e_id).all()))
-            details.people = people
-            past_events.append(details)
-            people_met = list(map(lambda mapping: mapping.person_email_alias, EventRegistrants.query.filter_by(event_id=e_id).all()))
-    print(people_met)
-    print(past_events)
+        if details!=None:
+            if details.event_end < datetime.utcnow() and details.event_status=="completed":
+                people = list(map(lambda mapping: mapping.person_email_alias, EventRegistrants.query.filter_by(event_id=e_id).all()))
+                details.people = people
+                past_events.append(details)
+                people_met = list(map(lambda mapping: mapping.person_email_alias, EventRegistrants.query.filter_by(event_id=e_id).all()))
     return render_template('history.html', title='History', items=items, people=people_met, events=past_events)
 
 @app.route('/new')
@@ -141,7 +175,42 @@ def new():
 
 @app.route('/new_event_created', methods=['POST'])
 def create():
-    return render_template('current_events.html', title='Current Events', items=items)
+    class Object(object):
+        pass
+    details = Object()
+    details.event_name = request.form['event_name']
+    details.event_type = request.form['event_type']
+    details.food = True if request.form['food']=='true' else False
+    details.event_start = datetime.strptime(request.form['event_start'], '%Y-%m-%dT%H:%M')
+    details.event_end = datetime.strptime(request.form['event_end'], '%Y-%m-%dT%H:%M')
+    details.event_location = request.form['event_location']
+    details.near_to = request.form['near_to']
+    details.min_people = request.form['min_people']
+    details.max_people = request.form['max_people']
+    details.event_desc = request.form['event_desc']
+    details.event_status = "pending"
+    details.creation_time = datetime.utcnow()
+    details.created_by = alias
+    new_event = Event(event_name=details.event_name,
+                      event_type=details.event_type,
+                      food=details.food,
+                      event_start=details.event_start,
+                      event_end=details.event_end,
+                      event_location=details.event_location,
+                      near_to=details.near_to,
+                      min_people=details.min_people,
+                      max_people=details.max_people,
+                      event_desc=details.event_desc,
+                      event_status=details.event_status,
+                      creation_time=details.creation_time,
+                      created_by=details.created_by)
+    db.session.add(new_event)
+    db.session.commit()
+    new_event_id = Event.query.filter((Event.creation_time==details.creation_time) & (Event.created_by==alias)).first().event_id
+    new_registrant = EventRegistrants(event_id=new_event_id,person_email_alias=alias, attended=None)
+    db.session.add(new_registrant)
+    db.session.commit()
+    return redirect(url_for('running'))
 
 @app.route('/interests')
 def interests():
@@ -155,7 +224,18 @@ def edit():
     db.session.commit()
     for update in selected_updated_id:
         new = PersonInterests(person_email_alias=alias, interest_id=update)
-        print(interests_list[int(update)-1])
         db.session.add(new)
     db.session.commit()
     return redirect(url_for('interests'))
+
+@app.route('/test')
+def test():
+    pass
+
+def update_events_status():
+    # not completed, or todo/pending?
+    events = Event.query.filter((Event.event_end<datetime.utcnow()) & ((Event.event_status!="completed") | (Event.event_status!="_completed"))).all()
+    for i in range(len(events)):
+        print(events[i])
+        events[i].event_status = "_completed"
+    db.session.commit()

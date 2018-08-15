@@ -1,0 +1,50 @@
+{% extends "sidebar.html" %}
+
+{% block main %}
+	<div style="height:90vh; padding-left:16px; overflow:scroll-y;">
+		<h3>Events</h3>
+        {% for event in events %}
+            <p>{{event.event_id}}</p>
+            <p>{{event.event_name}}</p>
+            <p>{{event.event_type}}</p>
+            <p>{{event.food}}</p>
+            <p>{{event.event_start}}</p>
+            <p>{{event.event_end}}</p>
+            <p>{{event.event_location}}</p>
+            <p>{{event.near_to}}</p>
+            <p>{{event.min_people}}</p>
+            <p>{{event.max_people}}</p>
+            <p>{{event.event_desc}}</p>
+            <p>{{event.event_status}}</p>
+            <p>{{event.creation_time}}</p>
+            <p>{{event.created_by}}</p>
+            <hr>
+            {% endfor %}
+		<h3>Persons</h3>
+        {% for person in persons %}
+            <p>{{person.email_alias}}</p>
+            <p>{{person.total_events_completed}}</p>
+            <p>{{person.total_events_attended}}</p>
+            <hr>
+        {% endfor %}
+		<h3>EventRegistrants</h3>
+        {% for registrant in registrants %}
+            <p>{{registrant.event_registrants_id}}</p>
+            <p>{{registrant.event_id}}</p>
+            <p>{{registrant.person_email_alias}}</p>
+            <hr>
+        {% endfor %}
+		<h3>Interests</h3>
+        {% for interest in interests %}
+            <p>{{interest.interest_id}}</p>
+            <p>{{interest.interest_name}}</p>
+            <hr>
+        {% endfor %}
+		<h3>PersonInterests</h3>
+        {% for personinterest in personinterests %}
+            <p>{{personinterest.person_interests_id}}</p>
+            <p>{{personinterest.person_email_alias}}</p>
+            <p>{{personinterest.interest_id}}</p>
+        {% endfor %}
+	</div>
+{% endblock %}

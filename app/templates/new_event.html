@@ -3,9 +3,9 @@
 {% block main %}
 	<div style="height:90vh; padding-left:16px;">
 		<form method="POST" action="/new_event_created">
-			<input type="text" placeholder="Event Name" id="event_name" ><br>
+			<input type="text" placeholder="Event Name" id="event_name" name="event_name"><br>
 			<label for="event_type1">Event Type:</label><br>
-			<select id="event_type1">
+			<select id="event_type1" name="event_type">
 				<option>Breakfast/Lunch/Dinner/Snacks</option>
 				<option>Sports/Games</option>
 				<option>Mentoring</option>
@@ -13,27 +13,34 @@
 				<option>Speak</option>
 			</select><br>
 			<label>Over Breakfast/Lunch/Dinner/Snacks:</label>
-			<input type="radio" name="food" checked> Yes
-			<input type="radio" name="food"> No <br>
-			<label for="event_date">Date:</label><br>
-			<input type="date" id="event_date"><br>
-			<label for="event_time">Time:</label><br>
-			<input type="time" id="event_time"><br>
-			<input type="text" placeholder="Event Location" id="event_loc" ><br>
+			<input type="radio" name="food" value="true" checked> Yes
+			<input type="radio" name="food" value="false"> No <br>
+			<label>From:<input type="datetime-local" id="event_start" name="event_start"></label><br>
+			<label>To:<input type="datetime-local" id="event_end" name="event_end"></label><br>
+			<input type="text" placeholder="Event Location" id="event_loc" name="event_location"><br>
 			<label for="closest_building">Location in/near:</label><br>
-			<select id="closest_building">
+			<select id="closest_building" name="near_to">
 				<option>B1</option>
 				<option>B2</option>
 				<option>B3</option>
 				<option>SSKC</option>
 			</select><br>
-			<label for="people">Number of people (inclusive range):</label><br>
-			<input type="number" placeholder="Minimum" id="people" ><br>
-			<input type="number" placeholder="Maximum" id="people" ><br>
-			<label for="event_description">Comment:</label><br>
-  			<textarea rows="5" id="event_description"></textarea><br>
+			<label>Number of people (inclusive range, including you):
+                <br><input type="number" placeholder="Minimum" name="min_people">
+                <br><input type="number" placeholder="Maximum" name="max_people">
+            </label><br>
+			<label for="event_description">Description:</label><br>
+  			<textarea rows="5" id="event_description" name="event_desc"></textarea><br>
   			<button type="submit" value="Submit">Submit</button>
 			<button type="reset" value="Reset">Reset</button>
 		</form>
 	</div>
+    <script>
+        function verify() {
+            let event_start = document.getElementById('event_start').getAttribute('value');
+            let event_end = document.getElementById('event_end').getAttribute('value');
+            console.log(event_start)
+            console.log(event_end)
+        }
+    </script>
 {% endblock %}

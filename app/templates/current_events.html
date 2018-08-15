@@ -66,7 +66,10 @@
                         <p>Please confirm that you want to drop out of the event {{item.event_name}}</p>
                     </div>
                     <div class="modal-footer">
-                        <a class="button" href="#">Confirm</a>
+                        <form action="/drop" method="POST" id="drop">
+                            <input type="hidden" name="event_id" value="{{item.event_id}}">
+                        </form>
+                        <a class="button" href="#" onclick="document.getElementById('drop').submit()">Confirm</a>
                         <a class="button" href="#" data-dismiss="modal">Cancel</a>
                     </div>
                 </div>
@@ -77,26 +80,24 @@
 		<div style="width:100%; height:270px; display:flex; flex-direction:column; justify-content:space-around;">
 			<p style="color:#74838B; font-size:16px; margin-left:8px; margin-top:8px;">Pending</p>
 			<div style="height:250px; overflow-x:auto; overflow-y:hidden; white-space:nowrap;" class="scrollbar">
+                {% if pending|length==0 %}
+                    <p>No pending events!</p>
+                {% endif %}
                 {% for item in pending %}
-                    {% if item %}
-                        {{card(item, loop.index)}}
-                        {{modals(item, loop.index)}}
-                    {% else %}
-                        <p>No pending events!</p>
-                    {% endif %}
+                    {{card(item, loop.index)}}
+                    {{modals(item, loop.index)}}
                 {% endfor %}
 			</div>
 		</div>
 		<div style="width:100%; height:270px; display:flex; flex-direction:column; justify-content:space-around;">
 			<p style="color:#74838B; font-size:16px; margin-left:8px; margin-top:8px;">To-Do</p>
 			<div style="height:250px; overflow-x:auto; overflow-y:hidden; white-space:nowrap;" class="scrollbar">
-				{% for item in pending %}
-                    {% if item %}
-                        {{card(item, loop.index)}}
-                        {{modals(item, loop.index)}}
-                    {% else %}
-                        <p>No events to attend!</p>
-                    {% endif %}
+                {% if todo|length==0 %}
+                    <p>No events to attend!</p>
+                {% endif %}
+				{% for item in todo %}
+                    {{card(item, loop.index)}}
+                    {{modals(item, loop.index)}}
                 {% endfor %}
 			</div>
 		</div>
